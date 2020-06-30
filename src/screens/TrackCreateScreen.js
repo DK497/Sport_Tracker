@@ -1,46 +1,32 @@
 import '../_mockLocation'
-import React,{useState,useEffect} from 'react'
+import React,{useContext,useCallback} from 'react'
 import { View, StyleSheet } from 'react-native';
 import { Text } from 'react-native-elements';
-import { SafeAreaView } from 'react-navigation'
+import { SafeAreaView,withNavigationFocus } from 'react-navigation'
 import Map from '../components/Map'
-import {requestPermissionsAsync,watchPositionAsync,Accuracy} from 'expo-location'
+import {Context as Lcontext   } from '../components/context/LocationContext' 
+import useLocation from '../components/Hooks/useLocation'
+import TrackForm from '../components/TrackForm'
 
-const TrackCreateScreen = () => {
-    const [error, seterror] = useState(null)
-    const startWatching = async () => {
-        try {
-          const { granted } = await requestPermissionsAsync();
-          if (!granted) {
-            throw new Error('Location permission not granted');
-          }
-          await watchPositionAsync({
-              accuracy:Accuracy.BestForNavigation,
-              timeInterval:1000,
-              distanceInterval:10
-          },(location)=>{
-                console.log(location)
-          })
-        } catch (e) {
-          seterror(e);
-        }
-      }
-      useEffect(() => {
-         startWatching()
-      },[])
 
-    return (
+const TrackCreateScreen = ({isFocused}) => {
+  const {state,al}=useContext(Lcontext)
+  const callback=useCallback((location)=>{
+    al(location,state.recording)
+},[state.recording])
+  const [error]=useLocation(isFocused,callback)
+  //sending add location function to useLocation Hook
+
+  return (
     <SafeAreaView forceInset={{ top: 'always' }}>
         <Text style={{ fontSize: 48 }}>TrackCreate Screen</Text>
         <Map />
+      
         {error?<Text style={{color:'red'}}>Please Enable location</Text>:null}
+        <TrackForm/>
     </SafeAreaView>
 
     )
 }
 
-const styles = StyleSheet.create({
-
-})
-
-export default TrackCreateScreen;
+export default withNavigationFocus(TrackCreateScreen);
