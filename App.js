@@ -10,8 +10,10 @@ import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
 import {Provider as AuthProvider} from './src/components/context/AuthContext'
 import {setNavigator} from './src/navigationRef'
+import ResolveAuthScreen from './src/screens/ResolveAuthScreen'
 
 const switchNavigator=createSwitchNavigator({
+  Resolve:ResolveAuthScreen,
   loginFlow:createStackNavigator({
     Signup:SignupScreen,
     Signin:SigninScreen,

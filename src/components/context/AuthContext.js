@@ -12,17 +12,38 @@ const authReducer=(state,action)=>{
         case 'signup':{
             return {errorMessage:'',token:action.payload}
         }
+        case 'clear_error_message':{
+            return {...state,errorMessage:''}
+        }
+        case 'signout':{
+            return {errorMessage:'',token:null}
+        }
+        
         default:{
             return state
         }
     }
 }
 
+const tryLocalSignin=(dispatch)=>async ()=>{
+    const token=await AsyncStorage.getItem('token')
+    if(token){
+        dispatch({type:'signup',payload:token})
+        navigate('TrackList')
+    }else{navigate('Signup')
+
+    }
+    
+}  
+
+const clearErrorMessage=(dispatch)=>()=>{
+    dispatch({type:"clear_error_message"})
+}
 const signup=(dispatch)=>async ({email,password})=>{
    try{
    const response=await trackerApi.post('/signup',{email,password})
    await AsyncStorage.setItem('token',response.data.token)
-   dispatch({type:signup,payload:response.data.token})
+   dispatch({type:'signup',payload:response.data.token})
    navigate('TrackList')
    }catch(err){
     dispatch({type:'add_error',payload:'Something went wrong with sign UP'})
@@ -30,18 +51,27 @@ const signup=(dispatch)=>async ({email,password})=>{
    }
 
 
-const signin=(dispatch)=>{
-    return ({email,password})=>{
+const signin=(dispatch)=>async ({email,password})=>{
+    try{
+        const response=await trackerApi.post('/signin',{email,password})
+        await AsyncStorage.setItem('token',response.data.token)
+        dispatch({type:'signup',payload:response.data.token})
+        navigate('TrackList')
+        }catch(err){
+         dispatch({type:'add_error',payload:'Something went wrong with sign in'})
+        }
+    } 
  
-    }
- }
  const signout=(dispatch)=>{
-    return ({email,password})=>{
+    return async()=>{
+       await AsyncStorage.removeItem('token')
+       dispatch({type:'signout'})
+       navigate('loginFlow')
  
     }
  }
 
 export const {Context,Provider}=createDataContext(
                     authReducer,
-                  {si:signin,su:signup,so:signout},{token:null,errorMessage:''})
+                  {ts:tryLocalSignin,si:signin,su:signup,so:signout,cem:clearErrorMessage},{token:null,errorMessage:''})
 

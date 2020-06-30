@@ -1,36 +1,25 @@
-import React, { useState, useContext } from 'react'
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { Text, Input, Button } from 'react-native-elements'
-import Spacer from '../components/Spacer'
+import React, { useContext } from 'react'
+import { View, StyleSheet } from 'react-native';
+import {NavigationEvents} from 'react-navigation'
 import { Context as AuthContext } from '../components/context/AuthContext'
+import AuthForm from '../components/AuthForm'
+import NavLink from '../components/NavLink'
 
 
-
-const SignupScreen = ({ navigation }) => {
-    const { state, su } = useContext(AuthContext)
-    const [email, setemail] = useState('')
-    const [password, setpassword] = useState('')
+const SignupScreen = () => {
+    const { state, su,cem} = useContext(AuthContext)
+    
+    
 
     return (
         <View style={styles.container}>
-            <Spacer>
-                <Text h3>Signup for Tracker</Text>
-            </Spacer>
-            <Input label="Email" autoCapitalize="none" autoCorrect={false}
-                value={email} onChangeText={(ne) => setemail(ne)} />
-            <Spacer />
-            <Input secureTextEntry={true} label="Password" autoCapitalize="none" autoCorrect={false}
-                value={password} onChangeText={(np) => setpassword(np)} />
-            {state.errorMessage ? <Text style={{ fontSize: 16, color: 'red', marginLeft: 12, marginBottom: 10 }}>{state.errorMessage}</Text> : null}
-            <Spacer>
-                <Button title="SignUP" onPress={() => su({ email, password })} />
-            </Spacer>
-            <TouchableOpacity onPress={() => { navigation.navigate('Signin') }}>
-                <Spacer>
-                    <Text style={{color:"blue"}}>Already have an Account?Signin Instead</Text>
-                </Spacer>  
-            </TouchableOpacity>
-
+            <NavigationEvents onWillFocus={cem}/>
+            <AuthForm headerText='Sign Up for Tracker' 
+            errorMessage={state.errorMessage} 
+            onSubmit={({email,password})=>su({email,password})}
+            sbuttontext="SignUp"/>
+            
+       <NavLink text="Already Registered ,Use Signin instead" routeName='Signin'/>
 
         </View>
 
