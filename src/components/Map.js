@@ -4,7 +4,7 @@ import MapView ,{Polyline,Circle} from 'react-native-maps'
 import {Context as LContext} from '../components/context/LocationContext'
 
 const Map = () => {
-   const {state:{currentLocation}} =useContext(LContext)
+   const {state:{currentLocation,locations}} =useContext(LContext)
    if(!currentLocation){
        return <ActivityIndicator size='large' style={{marginTop:200}}/>
     //    prints running spinner
@@ -26,7 +26,7 @@ const Map = () => {
                     <Circle center={currentLocation.coords}
                             radius={50} strokeColor="rgba(158,158,255,1)" 
                             fillColor="rgba(158,158,255,0.3)"/>
-              {/* <Polyline coordinates={points}/> */}
+              <Polyline coordinates={locations.map((q)=>q.coords)}/>
             </MapView>
         </View>
         )
